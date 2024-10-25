@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Week;
 use App\Models\Track;
 use App\Players\Player;
@@ -22,7 +23,7 @@ class TrackController extends Controller
     {
         return view('app.tracks.show', [
             'week' => $week->loadCount('tracks'),
-            'track' => $track->loadCount('likes'),
+            'track' => $track->loadCount('likes')->load('category'),
             'tracks_count' => $week->tracks_count,
             'position' => $week->getTrackPosition($track),
             'liked' => $request->user()->likes()->whereTrackId($track->id)->exists(),
@@ -36,6 +37,7 @@ class TrackController extends Controller
     public function create(UserService $user): View
     {
         return view('app.tracks.create', [
+            'categories' => Category::all(),
             'week' => Week::current(),
             'remaining_tracks_count' => $user->remainingTracksCount(),
         ]);
@@ -52,6 +54,7 @@ class TrackController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'artist' => ['required', 'string', 'max:255'],
             'url' => ['required', 'url', new PlayerUrl()],
+            'category_id' => ['required', 'exists:categories,id'],
         ]);
 
         DB::beginTransaction();

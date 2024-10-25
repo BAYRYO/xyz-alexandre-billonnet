@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Week;
 use App\Models\Track;
+use App\Observers\TrackObserver;
 use Illuminate\View\View;
 use App\Services\UserService;
 use Illuminate\Contracts\Foundation\Application;
@@ -40,5 +41,8 @@ class AppServiceProvider extends ServiceProvider
         Facades\View::composer('components.navigation', fn (View $view) => $view->with([
             'week' => request()->week
         ]));
+
+        Track::observe(TrackObserver::class);
+
     }
 }
